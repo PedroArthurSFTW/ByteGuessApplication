@@ -5,6 +5,6 @@ import com.github.byteguessapplication.data.CardRepository
 import com.github.byteguessapplication.data.local.AppDatabase
 
 class ByteGuessApplication : Application() {
-    val database by lazy { AppDatabase.getDatabase(this) }
-    val repository by lazy { CardRepository(database.cardDao()) }
+    val database by lazy { AppDatabase.getInstance(this) }
+    val repository by lazy { CardRepository(database.cardDao(),) }
 }

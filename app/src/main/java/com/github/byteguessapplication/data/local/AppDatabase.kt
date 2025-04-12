@@ -4,27 +4,37 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.github.byteguessapplication.ByteGuessApplication
 
 @Database(
-    entities = [Card::class], // Sua entidade Card deve estar listada aqui
+    entities = [
+        CategoryEntity::class,
+        CardEntity::class,
+        TipEntity::class
+    ],
     version = 1,
-    exportSchema = false
+    exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun cardDao(): CardDao // Esta declaração deve existir e corresponder à sua interface
+
+    abstract fun categoryDao(): CategoryDao
+    abstract fun cardDao(): CardDao
+    abstract fun tipDao(): TipDao
 
     companion object {
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        fun getDatabase(context: Context): AppDatabase {
+        private const val DATABASE_NAME = "byte_guess"
+
+        fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "app_database"
+                    DATABASE_NAME
                 ).build()
+
                 INSTANCE = instance
                 instance
             }

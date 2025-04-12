@@ -55,7 +55,7 @@ fun AppPreview() {
                     Room.inMemoryDatabaseBuilder(
                         context.applicationContext,
                         AppDatabase::class.java
-                    ).build().cardDao()
+                    ).build().cardDao(),
                 )
             )
         }
