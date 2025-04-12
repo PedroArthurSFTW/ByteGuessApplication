@@ -48,7 +48,8 @@ google-services.json
 google-services.json.orig
 app/google-services.json
 
-# Arquivos de configuração do Play
+# Arquivos de configuração do Playls
+
 app/publish/
 app/publishing/
 release/
