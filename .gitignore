@@ -1,0 +1,58 @@
+# Padrões do Android Studio
+/.idea
+*.iml
+.gradle
+/local.properties
+/.cxx
+/.externalNativeBuild
+/captures
+/build
+*.keystore
+
+# Arquivos específicos do Android
+app/build/
+app/release/
+app/*.apk
+app/*.aab
+*.log
+
+# Arquivos gerados pelo sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos do ambiente de desenvolvimento
+*.swp
+*.swo
+*~
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardSettings.xml
+.idea/dictionaries
+.idea/libraries
+.idea/modules.xml
+
+# Arquivos do Gradle
+!gradle-wrapper.jar
+/.gradle
+/gradle-app.setting
+
+# Configurações específicas do Kotlin
+*.kotlin_module
+
+# Arquivos de configuração pessoais
+*.orig
+
+# Firebase e Google Services
+google-services.json
+google-services.json.orig
+app/google-services.json
+
+# Arquivos de configuração do Play
+app/publish/
+app/publishing/
+release/
+
+# Arquivos de configuração do Android
+app/proguard-rules.pro
+app/debug.keystore
