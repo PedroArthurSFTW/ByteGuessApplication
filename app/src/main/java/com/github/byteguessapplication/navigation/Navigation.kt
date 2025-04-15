@@ -1,0 +1,69 @@
+package com.github.byteguessapplication.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.github.byteguessapplication.presentation.screens.CardListScreen
+import com.github.byteguessapplication.presentation.viewmodel.CardViewModel
+import com.github.byteguessapplication.ui.theme.ByteGuessApplicationTheme
+
+@Composable
+fun AppNavigation(viewModel: CardViewModel) {
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Main.route
+    ) {
+        composable(Screen.Main.route) {
+            ByteGuessApplicationTheme {
+                CardListScreen(
+                    viewModel = viewModel,
+                    onNavigate = { event ->
+                        when (event) {
+                            is CardViewModel.NavigationEvent.NavigateToCreateCard -> {
+                                navController.navigate(
+                                    Screen.CreateCard.withArgs(event.mode.name)
+                                )
+                            }
+                            is CardViewModel.NavigationEvent.NavigateToPlay -> {
+                                navController.navigate(
+                                    Screen.Play.withArgs(event.mode.name)
+                                )
+                            }
+                            is CardViewModel.NavigationEvent.NavigateToEdit -> {
+                                navController.navigate(
+                                    Screen.Edit.withArgs(event.mode.name)
+                                )
+                            }
+                        }
+                    }
+                )
+            }
+        }
+
+        composable(
+            route = Screen.CreateCard.routeWithArgs,
+            arguments = Screen.CreateCard.arguments
+        ) { backStackEntry ->
+            // Implementar tela de criação
+        }
+
+        composable(
+            route = Screen.Play.routeWithArgs,
+            arguments = Screen.Play.arguments
+        ) { backStackEntry ->
+            // Implementar tela de jogo
+        }
+
+        composable(
+            route = Screen.Edit.routeWithArgs,
+            arguments = Screen.Edit.arguments
+        ) { backStackEntry ->
+            // Implementar tela de edição
+        }
+    }
+}
