@@ -26,6 +26,9 @@ interface CardDao {
     @Query("SELECT * FROM cards WHERE category_id = :categoryId ORDER BY answer ASC")
     fun getCardsByCategory(categoryId: Long): Flow<List<CardEntity>>
 
+    @Query("SELECT EXISTS(SELECT 1 FROM cards WHERE answer = :answer LIMIT 1)")
+    suspend fun doesAnswerExist(answer: String): Boolean
+
     @Query("SELECT * FROM cards ORDER BY answer ASC")
     fun getAllCards(): Flow<List<CardEntity>>
 }

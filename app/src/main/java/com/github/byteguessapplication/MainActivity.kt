@@ -14,7 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.room.Room
 import com.github.byteguessapplication.data.local.AppDatabase
-import com.github.byteguessapplication.data.CardRepository
+import com.github.byteguessapplication.data.local.CardRepository
 import com.github.byteguessapplication.presentation.screens.CardListScreen
 import com.github.byteguessapplication.presentation.viewmodel.CardViewModel
 import com.github.byteguessapplication.presentation.viewmodel.CardViewModelFactory
