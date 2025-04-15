@@ -2,7 +2,7 @@ package com.github.byteguessapplication.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.github.byteguessapplication.data.CardRepository
+import com.github.byteguessapplication.data.local.CardRepository
 
 class CardViewModelFactory(
     private val repository: CardRepository
