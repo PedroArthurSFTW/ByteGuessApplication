@@ -30,6 +30,9 @@ class CreateCardViewModel @Inject constructor(
     private val _availableCategories = MutableStateFlow<List<CategoryEntity>>(emptyList())
     val availableCategories: StateFlow<List<CategoryEntity>> = _availableCategories.asStateFlow()
 
+    private val _isCategoryLightMode = MutableStateFlow(true)
+    val isCategoryLightMode: StateFlow<Boolean> = _isCategoryLightMode.asStateFlow()
+
     private val _tips = MutableStateFlow<List<String>>(listOf(""))
     val tips: StateFlow<List<String>> = _tips.asStateFlow()
 
@@ -51,6 +54,10 @@ class CreateCardViewModel @Inject constructor(
 
     init {
         loadCategories()
+    }
+
+    fun onLightModeToggled(isLight: Boolean) {
+        _isCategoryLightMode.value = isLight
     }
 
     fun onAnswerChanged(newAnswer: String) {
@@ -128,7 +135,7 @@ class CreateCardViewModel @Inject constructor(
                 if (existingCategory == null) {
                     val newCategoryEntity = CategoryEntity(
                         name = selectedCategoryName,
-                        isLightMode = categoryDataFromSelection.isLightMode
+                        isLightMode = _isCategoryLightMode.value
                     )
                     categoryIdToUse = categoryRepository.addCategory(newCategoryEntity)
                 } else {

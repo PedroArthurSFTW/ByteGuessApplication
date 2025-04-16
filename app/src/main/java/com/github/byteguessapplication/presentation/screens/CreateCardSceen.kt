@@ -35,6 +35,8 @@ fun CreateCardScreen(
     val errorState by viewModel.errorState.collectAsState()
     val isSaveEnabled by viewModel.isSaveEnabled.collectAsState()
 
+    val isCategoryLightMode by viewModel.isCategoryLightMode.collectAsState()
+
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
@@ -96,6 +98,18 @@ fun CreateCardScreen(
                 isLoading = isLoadingCategories,
                 errorText = errorState.categoryError
             )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Use Light/Dark Mode for New Category")
+                Switch(
+                    checked = isCategoryLightMode,
+                    onCheckedChange = { viewModel.onLightModeToggled(it) }
+                )
+            }
 
             Text("Tips", style = MaterialTheme.typography.titleMedium)
 
