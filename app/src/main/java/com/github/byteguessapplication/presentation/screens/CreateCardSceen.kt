@@ -20,13 +20,6 @@ import com.github.byteguessapplication.data.local.CategoryEntity
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.byteguessapplication.presentation.viewmodel.CreateCardViewModel
 
-data class FormErrorState(
-    val answerError: String? = null,
-    val categoryError: String? = null,
-    val tipsError: String? = null,
-    val generalError: String? = null
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateCardScreen(

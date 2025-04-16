@@ -6,20 +6,13 @@ import com.github.byteguessapplication.data.local.CardEntity
 import com.github.byteguessapplication.data.local.CategoryEntity
 import com.github.byteguessapplication.data.local.CardRepository
 import com.github.byteguessapplication.data.local.CategoryRepository
+import com.github.byteguessapplication.data.local.FormErrorState
 import com.github.byteguessapplication.data.local.TipEntity
 import com.github.byteguessapplication.data.local.TipRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-// TODO: ver onde vai ficar isso aqui pra n bugar o ícone da classe
-data class FormErrorState(
-    val answerError: String? = null,
-    val categoryError: String? = null,
-    val tipsError: String? = null,
-    val generalError: String? = null
-)
 
 @HiltViewModel
 class CreateCardViewModel @Inject constructor(
@@ -122,17 +115,41 @@ class CreateCardViewModel @Inject constructor(
             }
 
             val currentAnswer = _answer.value
-            val currentCategory = _selectedCategory.value!!
+            val categoryDataFromSelection = _selectedCategory.value!!
+            val selectedCategoryName = categoryDataFromSelection.name
             val currentTips = _tips.value.map { it.trim() }.filter { it.isNotEmpty() }
 
             _errorState.update { it.copy(generalError = null) }
 
             try {
-                categoryRepository.addCategory(CategoryEntity(name = currentCategory.name, isLightMode = true))
-                cardRepository.addCard(card = CardEntity(answer = currentAnswer, categoryId = currentCategory.id))
-                currentTips.forEach { tipText ->
-                    tipRepository.addTip(tip = TipEntity(text = tipText, cardId = currentCategory.id))
+                var categoryIdToUse: Long
+                val existingCategory = categoryRepository.getCategoryByName(selectedCategoryName)
+
+                if (existingCategory == null) {
+                    val newCategoryEntity = CategoryEntity(
+                        name = selectedCategoryName,
+                        isLightMode = categoryDataFromSelection.isLightMode
+                    )
+                    categoryIdToUse = categoryRepository.addCategory(newCategoryEntity)
+                } else {
+                    categoryIdToUse = existingCategory.id
                 }
+
+                val cardToInsert = CardEntity(
+                    answer = currentAnswer,
+                    categoryId = categoryIdToUse
+                )
+
+                val newCardId = cardRepository.addCard(card = cardToInsert)
+
+                currentTips.forEach { tipText ->
+                    val tipToInsert = TipEntity(
+                        text = tipText,
+                        cardId = newCardId
+                    )
+                    tipRepository.addTip(tip = tipToInsert)
+                }
+
                 _saveResult.emit(true)
 
             } catch (e: Exception) {
@@ -141,7 +158,6 @@ class CreateCardViewModel @Inject constructor(
             }
         }
     }
-
 
     private suspend fun validateInput(): Boolean {
         var isValid = true
