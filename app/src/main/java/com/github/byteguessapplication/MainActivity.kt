@@ -18,7 +18,7 @@ import com.github.byteguessapplication.ui.theme.ByteGuessApplicationTheme
 class MainActivity : ComponentActivity() {
     private val viewModel: CardViewModel by viewModels {
         CardViewModelFactory(
-            (application as ByteGuessApplication).repository
+            (application as ByteGuessApplication).cardRepository
         )
     }
 

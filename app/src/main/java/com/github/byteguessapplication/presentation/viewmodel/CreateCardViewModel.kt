@@ -6,6 +6,8 @@ import com.github.byteguessapplication.data.local.CardEntity
 import com.github.byteguessapplication.data.local.CategoryEntity
 import com.github.byteguessapplication.data.local.CardRepository
 import com.github.byteguessapplication.data.local.CategoryRepository
+import com.github.byteguessapplication.data.local.TipEntity
+import com.github.byteguessapplication.data.local.TipRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -22,8 +24,8 @@ data class FormErrorState(
 @HiltViewModel
 class CreateCardViewModel @Inject constructor(
     private val cardRepository: CardRepository,
-    private val categoryRepository: CategoryRepository
-    // private val saveCardUseCase: SaveCardUseCase
+    private val categoryRepository: CategoryRepository,
+    private val tipRepository: TipRepository
 ) : ViewModel() {
 
     private val _answer = MutableStateFlow("")
@@ -126,8 +128,11 @@ class CreateCardViewModel @Inject constructor(
             _errorState.update { it.copy(generalError = null) }
 
             try {
-                // TODO: Salvar primeiro as dicas pra depois salvar as cartas
+                categoryRepository.addCategory(CategoryEntity(name = currentCategory.name, isLightMode = true))
                 cardRepository.addCard(card = CardEntity(answer = currentAnswer, categoryId = currentCategory.id))
+                currentTips.forEach { tipText ->
+                    tipRepository.addTip(tip = TipEntity(text = tipText, cardId = currentCategory.id))
+                }
                 _saveResult.emit(true)
 
             } catch (e: Exception) {

@@ -8,7 +8,10 @@ import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "tips",
-    indices = [Index(value = ["card_id"])],
+    indices = [
+        Index(value = ["card_id"]),
+        Index(value = ["text"], unique = true)
+    ],
     foreignKeys = [
         ForeignKey(
             entity = CardEntity::class,
