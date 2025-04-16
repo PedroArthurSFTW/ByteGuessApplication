@@ -33,7 +33,6 @@ fun CardListScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Opção 1: Criar Novo Card
         MenuButtonWithDropdown(
             mainText = "Criar Novo Card",
             items = listOf("Light Mode" to CardViewModel.CardMode.LIGHT, "Dark Mode" to CardViewModel.CardMode.DARK),
@@ -42,7 +41,6 @@ fun CardListScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Opção 2: Jogar
         MenuButtonWithDropdown(
             mainText = "Jogar",
             items = listOf(
@@ -55,19 +53,17 @@ fun CardListScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Opção 3: Editar Card
         MenuButtonWithDropdown(
             mainText = "Editar Card",
             items = listOf("Light Mode" to CardViewModel.CardMode.LIGHT, "Dark Mode" to CardViewModel.CardMode.DARK),
             onItemSelected = { mode -> viewModel.onEditSelected(mode) }
         )
 
-        // Tratar estados
         when (val state = uiState) {
             is CardViewModel.UiState.Loading -> CircularProgressIndicator()
             is CardViewModel.UiState.Error -> Text("Erro: ${state.error}", color = Color.Red)
             is CardViewModel.UiState.CardsLoaded -> {
-                // Mostrar cards se necessário
+
             }
             else -> {}
         }

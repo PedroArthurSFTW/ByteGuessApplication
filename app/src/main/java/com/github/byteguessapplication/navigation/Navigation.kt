@@ -49,21 +49,21 @@ fun AppNavigation(viewModel: CardViewModel) {
             route = Screen.CreateCard.routeWithArgs,
             arguments = Screen.CreateCard.arguments
         ) { backStackEntry ->
-            // Implementar tela de criação
+
         }
 
         composable(
             route = Screen.Play.routeWithArgs,
             arguments = Screen.Play.arguments
         ) { backStackEntry ->
-            // Implementar tela de jogo
+
         }
 
         composable(
             route = Screen.Edit.routeWithArgs,
             arguments = Screen.Edit.arguments
         ) { backStackEntry ->
-            // Implementar tela de edição
+
         }
     }
 }

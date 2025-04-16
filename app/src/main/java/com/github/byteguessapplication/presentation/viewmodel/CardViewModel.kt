@@ -10,7 +10,6 @@ import kotlinx.coroutines.launch
 
 class CardViewModel(private val repository: CardRepository) : ViewModel() {
 
-    // Estados da UI
     sealed class UiState {
         object Loading : UiState()
         data class Success(val message: String? = null) : UiState()
@@ -33,7 +32,6 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
     private val _navigationEvent = MutableStateFlow<NavigationEvent?>(null)
     val navigationEvent: StateFlow<NavigationEvent?> = _navigationEvent
 
-    // Funções chamadas pela UI
     fun onCreateCardSelected(mode: CardMode) {
         _navigationEvent.value = NavigationEvent.NavigateToCreateCard(mode)
     }
