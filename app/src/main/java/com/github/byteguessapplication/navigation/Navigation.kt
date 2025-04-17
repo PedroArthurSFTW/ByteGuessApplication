@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.github.byteguessapplication.presentation.screens.CardListScreen
 import com.github.byteguessapplication.presentation.screens.CreateCardScreen
+import com.github.byteguessapplication.presentation.screens.GameScreen
 import com.github.byteguessapplication.presentation.viewmodel.CardViewModel
 import com.github.byteguessapplication.ui.theme.ByteGuessApplicationTheme
 
@@ -58,7 +59,7 @@ fun AppNavigation(viewModel: CardViewModel) {
             route = Screen.Play.route
         ) {
             ByteGuessApplicationTheme {
-                Text("Play Screen - Game Mode selection needed here")
+                GameScreen()
             }
         }
 
