@@ -32,6 +32,7 @@ class CreateCardViewModel @Inject constructor(
     // State Flows
     private val _answer = MutableStateFlow("")
     val answer: StateFlow<String> = _answer.asStateFlow()
+    var isCategoryLightMode: Boolean = false // Ou baseada em alguma lógica
 
     private val _selectedCategory = MutableStateFlow<CategoryEntity?>(null)
     val selectedCategory: StateFlow<CategoryEntity?> = _selectedCategory.asStateFlow()

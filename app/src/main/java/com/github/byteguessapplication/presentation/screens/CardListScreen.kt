@@ -47,15 +47,6 @@ fun CardListScreen(
             onItemSelected = { mode -> viewModel.onPlaySelected(mode) }
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Opção 3: Editar Card
-        MenuButtonWithDropdown(
-            mainText = "Editar Card",
-            items = listOf("Light Mode" to CardViewModel.CardMode.LIGHT, "Dark Mode" to CardViewModel.CardMode.DARK),
-            onItemSelected = { mode -> viewModel.onEditSelected(mode) }
-        )
-
         // Tratar estados
         when (val state = uiState) {
             is CardViewModel.UiState.Loading -> CircularProgressIndicator()

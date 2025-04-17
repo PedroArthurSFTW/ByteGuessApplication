@@ -18,6 +18,7 @@ import android.widget.Toast
 import com.github.byteguessapplication.data.local.CategoryEntity
 
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.github.byteguessapplication.presentation.viewmodel.CardViewModel
 import com.github.byteguessapplication.presentation.viewmodel.CreateCardViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,7 +26,8 @@ import com.github.byteguessapplication.presentation.viewmodel.CreateCardViewMode
 fun CreateCardScreen(
     viewModel: CreateCardViewModel = hiltViewModel<CreateCardViewModel>(),
     onNavigateBack: () -> Unit,
-    onSaveSuccess: () -> Unit
+    onSaveSuccess: () -> Unit,
+    createCardMode: CardViewModel.CardMode
 ) {
     val answer by viewModel.answer.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
@@ -34,8 +36,6 @@ fun CreateCardScreen(
     val isLoadingCategories by viewModel.isLoadingCategories.collectAsState()
     val errorState by viewModel.errorState.collectAsState()
     val isSaveEnabled by viewModel.isSaveEnabled.collectAsState()
-
-    val isCategoryLightMode by viewModel.isCategoryLightMode.collectAsState()
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -104,11 +104,7 @@ fun CreateCardScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Use Light/Dark Mode for New Category")
-                Switch(
-                    checked = isCategoryLightMode,
-                    onCheckedChange = { viewModel.onLightModeToggled(it) }
-                )
+                Text("Use Light Mode for New Category")
             }
 
             Text("Tips", style = MaterialTheme.typography.titleMedium)

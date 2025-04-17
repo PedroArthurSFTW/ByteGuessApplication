@@ -1,16 +1,14 @@
 package com.github.byteguessapplication.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.github.byteguessapplication.presentation.screens.CardListScreen
 import com.github.byteguessapplication.presentation.screens.CreateCardScreen
 import com.github.byteguessapplication.presentation.viewmodel.CardViewModel
-import com.github.byteguessapplication.presentation.viewmodel.CreateCardViewModel
 import com.github.byteguessapplication.ui.theme.ByteGuessApplicationTheme
 
 @Composable
@@ -48,18 +46,20 @@ fun AppNavigation(viewModel: CardViewModel) {
             }
         }
 
-        composable(Screen.CreateCard.route) {
-            ByteGuessApplicationTheme {
-                val createCardViewModel: CreateCardViewModel = hiltViewModel()
-                CreateCardScreen(
-                    viewModel = createCardViewModel,
-                    onNavigateBack = { navController.popBackStack() },
-                    onSaveSuccess = {
-                        navController.popBackStack()
-                        viewModel.loadCards()
-                    }
-                )
-            }
+        composable(
+            route = "createCard/{mode}",
+            arguments = listOf(navArgument("mode") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val modeArg = backStackEntry.arguments?.getString("mode")
+            val mode = if (modeArg != null) CardViewModel.CardMode.valueOf(modeArg) else CardViewModel.CardMode.LIGHT
+            CreateCardScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onSaveSuccess = {
+                    navController.popBackStack()
+                    viewModel.loadCards()
+                },
+                createCardMode = mode
+            )
         }
 
         composable(
