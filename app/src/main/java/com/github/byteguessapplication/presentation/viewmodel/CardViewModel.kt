@@ -10,6 +10,18 @@ import kotlinx.coroutines.launch
 
 class CardViewModel(private val repository: CardRepository) : ViewModel() {
 
+    private val _navigationEvent = MutableStateFlow<NavigationEvent?>(null)
+    val navigationEvent: StateFlow<NavigationEvent?> = _navigationEvent
+
+    fun navigateToCreateCard(mode: CardMode) {
+        _navigationEvent.value = NavigationEvent.NavigateToCreateCard(mode)
+    }
+
+    fun resetNavigation() {
+        _navigationEvent.value = null
+    }
+
+
     // Estados da UI
     sealed class UiState {
         object Loading : UiState()
@@ -29,9 +41,6 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Success())
     val uiState: StateFlow<UiState> = _uiState
-
-    private val _navigationEvent = MutableStateFlow<NavigationEvent?>(null)
-    val navigationEvent: StateFlow<NavigationEvent?> = _navigationEvent
 
     // Funções chamadas pela UI
     fun onCreateCardSelected(mode: CardMode) {
@@ -57,9 +66,5 @@ class CardViewModel(private val repository: CardRepository) : ViewModel() {
                 _uiState.value = UiState.Error("Erro ao carregar cards: ${e.message}")
             }
         }
-    }
-
-    fun resetNavigation() {
-        _navigationEvent.value = null
     }
 }

@@ -9,11 +9,12 @@ import com.github.byteguessapplication.data.local.CategoryRepository
 import com.github.byteguessapplication.data.local.TipEntity
 import com.github.byteguessapplication.data.local.TipRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-// TODO: ver onde vai ficar isso aqui pra n bugar o ícone da classe
 data class FormErrorState(
     val answerError: String? = null,
     val categoryError: String? = null,
@@ -28,6 +29,7 @@ class CreateCardViewModel @Inject constructor(
     private val tipRepository: TipRepository
 ) : ViewModel() {
 
+    // State Flows
     private val _answer = MutableStateFlow("")
     val answer: StateFlow<String> = _answer.asStateFlow()
 
@@ -43,18 +45,44 @@ class CreateCardViewModel @Inject constructor(
     private val _isLoadingCategories = MutableStateFlow(false)
     val isLoadingCategories: StateFlow<Boolean> = _isLoadingCategories.asStateFlow()
 
+    private val _isSaving = MutableStateFlow(false)
+    val isSaving: StateFlow<Boolean> = _isSaving.asStateFlow()
+
     private val _errorState = MutableStateFlow(FormErrorState())
     val errorState: StateFlow<FormErrorState> = _errorState.asStateFlow()
 
     private val _saveResult = MutableSharedFlow<Boolean>()
     val saveResult: SharedFlow<Boolean> = _saveResult.asSharedFlow()
 
-    val isSaveEnabled: StateFlow<Boolean> =
-        combine(answer, selectedCategory, tips) { ans, cat, tipList ->
-            ans.isNotBlank() && cat != null && tipList.any { it.isNotBlank() } && tipList.isNotEmpty()
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    val isSaveEnabled: StateFlow<Boolean> = combine(
+        answer,
+        selectedCategory,
+        tips,
+        isSaving
+    ) { ans, cat, tipList, saving ->
+        !saving && ans.isNotBlank() && cat != null && tipList.any { it.isNotBlank() }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = false
+    )
 
     private val MAX_TIPS = 10
+    private val _navigationEvent = MutableStateFlow<NavigationEvent?>(null)
+    val navigationEvent: StateFlow<NavigationEvent?> = _navigationEvent
+    fun navigateToCreateCard() {
+        _navigationEvent.value = NavigationEvent.NavigateToCreateCard
+    }
+
+
+    sealed class NavigationEvent {
+        object NavigateToCreateCard : NavigationEvent()
+    }
+
+    fun resetNavigation() {
+        _navigationEvent.value = null
+    }
+
 
     init {
         loadCategories()
@@ -62,16 +90,12 @@ class CreateCardViewModel @Inject constructor(
 
     fun onAnswerChanged(newAnswer: String) {
         _answer.value = newAnswer
-        if (_errorState.value.answerError != null) {
-            _errorState.update { it.copy(answerError = null, generalError = null) }
-        }
+        clearErrorIf { it.answerError != null }
     }
 
     fun onCategorySelected(category: CategoryEntity) {
         _selectedCategory.value = category
-        if (_errorState.value.categoryError != null) {
-            _errorState.update { it.copy(categoryError = null, generalError = null) }
-        }
+        clearErrorIf { it.categoryError != null }
     }
 
     fun onTipChanged(index: Int, text: String) {
@@ -80,14 +104,14 @@ class CreateCardViewModel @Inject constructor(
             currentTips[index] = text
             _tips.value = currentTips
             if (_errorState.value.tipsError != null && text.isNotBlank()) {
-                _errorState.update { it.copy(tipsError = null, generalError = null) }
+                clearErrorIf { it.tipsError != null }
             }
         }
     }
 
     fun addTipField() {
         if (_tips.value.size < MAX_TIPS) {
-            _tips.value += ""
+            _tips.value = _tips.value + ""
         }
     }
 
@@ -99,83 +123,105 @@ class CreateCardViewModel @Inject constructor(
         }
     }
 
+    fun saveCard() {
+        viewModelScope.launch {
+            _isSaving.value = true
+            try {
+                if (!validateInput()) {
+                    _saveResult.emit(false)
+                    return@launch
+                }
+
+                val currentAnswer = _answer.value.trim()
+                val currentCategory = _selectedCategory.value!!
+                val currentTips = _tips.value.map { it.trim() }.filter { it.isNotEmpty() }
+
+                // Save card
+                val cardId = cardRepository.addCard(
+                    CardEntity(
+                        answer = currentAnswer,
+                        categoryId = 1
+                    )
+                )
+
+                // Save tips
+                currentTips.forEach { tipText ->
+                    tipRepository.addTip(
+                        TipEntity(
+                            text = tipText,
+                            cardId = cardId
+                        )
+                    )
+                }
+
+                _saveResult.emit(true)
+            } catch (e: Exception) {
+                _errorState.update {
+                    it.copy(generalError = "Error saving card: ${e.localizedMessage ?: "Unknown error"}")
+                }
+                _saveResult.emit(false)
+            } finally {
+                _isSaving.value = false
+            }
+        }
+    }
+
+    private suspend fun validateInput(): Boolean {
+        return withContext(Dispatchers.Default) {
+            var isValid = true
+            val currentAnswer = _answer.value.trim()
+            val currentCategory = _selectedCategory.value
+            val nonBlankTips = _tips.value.count { it.isNotBlank() }
+
+            val newErrorState = FormErrorState(
+                answerError = when {
+                    currentAnswer.isBlank() -> "Answer cannot be empty.".also { isValid = false }
+                    cardRepository.doesAnswerExist(currentAnswer) ->
+                        "This answer already exists.".also { isValid = false }
+                    else -> null
+                },
+                categoryError = currentCategory?.let { null }
+                    ?: "Please select a category.".also { isValid = false },
+                tipsError = if (nonBlankTips == 0) {
+                    isValid = false
+                    "Please add at least one non-empty tip."
+                } else null
+            )
+
+            _errorState.update { newErrorState }
+            isValid
+        }
+    }
+
     private fun loadCategories() {
         viewModelScope.launch {
             _isLoadingCategories.value = true
-            categoryRepository.allCategories
-                .catch {
-                    _errorState.update { it.copy(generalError = "Could not load categories.") }
-                    _isLoadingCategories.value = false
-                }
-                .collect { categories ->
-                    _availableCategories.value = categories
-                    _isLoadingCategories.value = false
-                }
-        }
-    }
-
-    fun saveCard() {
-        viewModelScope.launch {
-            if (!validateInput()) {
-                _saveResult.emit(false)
-                return@launch
-            }
-
-            val currentAnswer = _answer.value
-            val currentCategory = _selectedCategory.value!!
-            val currentTips = _tips.value.map { it.trim() }.filter { it.isNotEmpty() }
-
-            _errorState.update { it.copy(generalError = null) }
-
             try {
-                categoryRepository.addCategory(CategoryEntity(name = currentCategory.name, isLightMode = true))
-                cardRepository.addCard(card = CardEntity(answer = currentAnswer, categoryId = currentCategory.id))
-                currentTips.forEach { tipText ->
-                    tipRepository.addTip(tip = TipEntity(text = tipText, cardId = currentCategory.id))
-                }
-                _saveResult.emit(true)
-
-            } catch (e: Exception) {
-                _errorState.update { it.copy(generalError = "Error saving card: ${e.message}") }
-                _saveResult.emit(false)
+                categoryRepository.allCategories
+                    .catch { e ->
+                        _errorState.update {
+                            it.copy(generalError = "Could not load categories: ${e.message}")
+                        }
+                    }
+                    .collect { categories ->
+                        _availableCategories.value = categories
+                    }
+            } finally {
+                _isLoadingCategories.value = false
             }
         }
     }
 
-
-    private suspend fun validateInput(): Boolean {
-        var isValid = true
-        val currentAnswer = _answer.value.trim()
-        val currentCategory = _selectedCategory.value
-        val nonBlankTips = _tips.value.count { it.isNotBlank() }
-
-        val answerError = if (currentAnswer.isBlank()) {
-            isValid = false
-            "Answer cannot be empty."
-        } else {
-            if (cardRepository.doesAnswerExist(currentAnswer)) {
-                isValid = false
-                "This answer already exists."
-            } else null
+    private fun clearErrorIf(predicate: (FormErrorState) -> Boolean) {
+        if (predicate(_errorState.value)) {
+            _errorState.update {
+                it.copy(
+                    answerError = null,
+                    categoryError = null,
+                    tipsError = null,
+                    generalError = null
+                )
+            }
         }
-
-
-        val categoryError = if (currentCategory == null) {
-            isValid = false
-            "Please select a category."
-        } else null
-
-        val tipsError = if (nonBlankTips == 0) {
-            isValid = false
-            "Please add at least one non-empty tip."
-        } else null
-
-        _errorState.value = FormErrorState(
-            answerError = answerError,
-            categoryError = categoryError,
-            tipsError = tipsError
-        )
-
-        return isValid
     }
 }

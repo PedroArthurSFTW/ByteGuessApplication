@@ -35,34 +35,30 @@ fun CardListScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Opção 1: Criar Novo Card
-        MenuButtonWithDropdown(
-            mainText = "Criar Novo Card",
-            items = listOf("Light Mode" to CardViewModel.CardMode.LIGHT, "Dark Mode" to CardViewModel.CardMode.DARK),
-            onItemSelected = { mode -> viewModel.onCreateCardSelected(mode) }
-        )
+
+        Button(
+            onClick = {
+                viewModel.navigateToCreateCard(CardViewModel.CardMode.LIGHT)
+            },
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .padding(vertical = 8.dp)
+        ) {
+            Text("Criar Novo Card")
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Opção 2: Jogar
-        MenuButtonWithDropdown(
-            mainText = "Jogar",
-            items = listOf(
-                "Light Mode" to CardViewModel.GameMode.LIGHT,
-                "Dark Mode" to CardViewModel.GameMode.DARK,
-                "Jogar Sozinho" to CardViewModel.GameMode.SOLO
-            ),
-            onItemSelected = { mode -> viewModel.onPlaySelected(mode) }
-        )
+        Button(
+            onClick = { /* ação do Jogar */ },
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .padding(vertical = 8.dp)
+        ) {
+            Text("Jogar")
+        }
 
-        Spacer(modifier = Modifier.height(24.dp))
 
-        // Opção 3: Editar Card
-        MenuButtonWithDropdown(
-            mainText = "Editar Card",
-            items = listOf("Light Mode" to CardViewModel.CardMode.LIGHT, "Dark Mode" to CardViewModel.CardMode.DARK),
-            onItemSelected = { mode -> viewModel.onEditSelected(mode) }
-        )
 
         // Tratar estados
         when (val state = uiState) {
