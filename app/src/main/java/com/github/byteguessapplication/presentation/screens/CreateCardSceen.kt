@@ -20,13 +20,6 @@ import com.github.byteguessapplication.data.local.CategoryEntity
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.byteguessapplication.presentation.viewmodel.CreateCardViewModel
 
-data class FormErrorState(
-    val answerError: String? = null,
-    val categoryError: String? = null,
-    val tipsError: String? = null,
-    val generalError: String? = null
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateCardScreen(
@@ -41,6 +34,8 @@ fun CreateCardScreen(
     val isLoadingCategories by viewModel.isLoadingCategories.collectAsState()
     val errorState by viewModel.errorState.collectAsState()
     val isSaveEnabled by viewModel.isSaveEnabled.collectAsState()
+
+    val isCategoryLightMode by viewModel.isCategoryLightMode.collectAsState()
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -103,6 +98,18 @@ fun CreateCardScreen(
                 isLoading = isLoadingCategories,
                 errorText = errorState.categoryError
             )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Use Light/Dark Mode for New Category")
+                Switch(
+                    checked = isCategoryLightMode,
+                    onCheckedChange = { viewModel.onLightModeToggled(it) }
+                )
+            }
 
             Text("Tips", style = MaterialTheme.typography.titleMedium)
 

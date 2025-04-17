@@ -10,4 +10,8 @@ class CategoryRepository(private val categoryDao: CategoryDao) {
         return categoryDao.insert(category)
     }
 
+    suspend fun getCategoryByName(name: String): CategoryEntity? {
+        return categoryDao.getCategoryByName(name)
+    }
+
 }

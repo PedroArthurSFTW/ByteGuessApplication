@@ -23,6 +23,9 @@ interface CategoryDao {
     @Query("SELECT * FROM categories WHERE id = :id")
     suspend fun getCategoryById(id: Long): CategoryEntity?
 
+    @Query("SELECT * FROM categories WHERE name = :name")
+    suspend fun getCategoryByName(name: String): CategoryEntity?
+
     @Query("SELECT * FROM categories ORDER BY name ASC")
     fun getAllCategories(): Flow<List<CategoryEntity>>
 }
