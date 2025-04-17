@@ -67,7 +67,14 @@ fun AppNavigation(viewModel: CardViewModel) {
             route = Screen.Edit.route
         ) {
             ByteGuessApplicationTheme {
-                Text("Edit Screen - Card selection / Mode loading needed here")
+                CreateCardScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onSaveSuccess = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }
