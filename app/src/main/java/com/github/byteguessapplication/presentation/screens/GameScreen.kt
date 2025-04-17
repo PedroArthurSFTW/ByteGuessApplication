@@ -17,19 +17,15 @@ import kotlinx.coroutines.launch
 @Composable
 fun GameScreen(viewModel: GameViewModel = viewModel()) {
     val tips by viewModel.tips.collectAsState()
-    val currentAnswer by viewModel.currentAnswer.collectAsState()
-    val scope = rememberCoroutineScope()
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(tips) { tip ->
+            val answer by viewModel.getAnswerForCard(tip.cardId).collectAsState("Carregando...")
+
             TipItem(
                 tip = tip,
-                currentAnswerState = currentAnswer,
-                onCardClick = {
-                    scope.launch {
-                        viewModel.updateCurrentAnswer(tip.cardId)
-                    }
-                }
+                answer = answer,
+                onCardClick = { viewModel.toggleCardExpansion(tip.cardId) }
             )
         }
     }
@@ -38,7 +34,7 @@ fun GameScreen(viewModel: GameViewModel = viewModel()) {
 @Composable
 fun TipItem(
     tip: TipEntity,
-    currentAnswerState: String,
+    answer: String,
     onCardClick: () -> Unit
 ) {
     var isAnswerVisible by remember { mutableStateOf(false) }
@@ -59,7 +55,7 @@ fun TipItem(
 
         if (isAnswerVisible) {
             Text(
-                text = currentAnswerState,
+                text = answer,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(top = 8.dp)
             )
