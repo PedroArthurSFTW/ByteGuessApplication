@@ -57,7 +57,7 @@ fun CreateCardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Create New Card") },
+                title = { Text("Crie uma nova carta") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
@@ -84,7 +84,7 @@ fun CreateCardScreen(
             OutlinedTextField(
                 value = answer,
                 onValueChange = { viewModel.onAnswerChanged(it) },
-                label = { Text("Answer") },
+                label = { Text("Resposta") },
                 modifier = Modifier.fillMaxWidth(),
                 isError = errorState.answerError != null,
                 singleLine = true,
@@ -104,14 +104,14 @@ fun CreateCardScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Use Light/Dark Mode for New Category")
+                Text("Light Mode (Categoria)")
                 Switch(
                     checked = isCategoryLightMode,
                     onCheckedChange = { viewModel.onLightModeToggled(it) }
                 )
             }
 
-            Text("Tips", style = MaterialTheme.typography.titleMedium)
+            Text("Dicas", style = MaterialTheme.typography.titleMedium)
 
             if (errorState.tipsError != null) {
                 Text(errorState.tipsError!!, color = MaterialTheme.colorScheme.error)
@@ -132,7 +132,7 @@ fun CreateCardScreen(
             ) {
                 Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
                 Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                Text("Add Tip")
+                Text("Adicipnar Dica")
             }
 
             if (errorState.generalError != null) {
@@ -169,7 +169,7 @@ fun CategorySelector(
             value = selectedCategory?.name ?: "",
             onValueChange = { },
             readOnly = true,
-            label = { Text("Category") },
+            label = { Text("Categoria") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor()
@@ -184,13 +184,13 @@ fun CategorySelector(
         ) {
             if (isLoading) {
                 DropdownMenuItem(
-                    text = { Text("Loading...") },
+                    text = { Text("Carregando") },
                     onClick = { },
                     enabled = false
                 )
             } else if (availableCategories.isEmpty()) {
                 DropdownMenuItem(
-                    text = { Text("No categories found") },
+                    text = { Text("Nenhuma categoria encontrada") },
                     onClick = { },
                     enabled = false
                 )
@@ -224,12 +224,12 @@ fun TipInputItem(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            label = { Text("Tip #$tipNumber") },
+            label = { Text("Dica #$tipNumber") },
             modifier = Modifier.weight(1f),
         )
         if (canRemove) {
             IconButton(onClick = onRemoveClick) {
-                Icon(Icons.Filled.Close, contentDescription = "Remove Tip $tipNumber")
+                Icon(Icons.Filled.Close, contentDescription = "Remover dica $tipNumber")
             }
         } else {
             Spacer(modifier = Modifier.width(48.dp))

@@ -1,8 +1,11 @@
 package com.github.byteguessapplication.data.local
 
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class TipRepository(private val tipDao: TipDao) {
+@Singleton
+class TipRepository @Inject constructor(private val tipDao: TipDao) {
     suspend fun addTip(tip: TipEntity): Long {
         return tipDao.insert(tip)
     }

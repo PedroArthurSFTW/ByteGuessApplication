@@ -1,8 +1,11 @@
 package com.github.byteguessapplication.data.local
 
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class CardRepository(private val cardDao: CardDao) {
+@Singleton
+class CardRepository @Inject constructor(private val cardDao: CardDao) {
     val allCards: Flow<List<CardEntity>> = cardDao.getAllCards()
 
     suspend fun doesAnswerExist(answer: String): Boolean {

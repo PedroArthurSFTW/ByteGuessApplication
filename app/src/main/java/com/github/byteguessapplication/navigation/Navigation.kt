@@ -1,12 +1,12 @@
 package com.github.byteguessapplication.navigation
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.github.byteguessapplication.presentation.screens.CardListScreen
+import com.github.byteguessapplication.presentation.screens.CreateCardScreen
 import com.github.byteguessapplication.presentation.viewmodel.CardViewModel
 import com.github.byteguessapplication.ui.theme.ByteGuessApplicationTheme
 
@@ -24,20 +24,14 @@ fun AppNavigation(viewModel: CardViewModel) {
                     viewModel = viewModel,
                     onNavigate = { event ->
                         when (event) {
-                            is CardViewModel.NavigationEvent.NavigateToCreateCard -> {
-                                navController.navigate(
-                                    Screen.CreateCard.withArgs(event.mode.name)
-                                )
+                            is CardViewModel.NavigationEvent.NavigateToCreateCardScreen -> {
+                                navController.navigate(Screen.CreateCard.route)
                             }
-                            is CardViewModel.NavigationEvent.NavigateToPlay -> {
-                                navController.navigate(
-                                    Screen.Play.withArgs(event.mode.name)
-                                )
+                            is CardViewModel.NavigationEvent.NavigateToPlayScreen -> {
+                                navController.navigate(Screen.Play.route)
                             }
-                            is CardViewModel.NavigationEvent.NavigateToEdit -> {
-                                navController.navigate(
-                                    Screen.Edit.withArgs(event.mode.name)
-                                )
+                            is CardViewModel.NavigationEvent.NavigateToEditScreen -> {
+                                navController.navigate(Screen.Edit.route)
                             }
                         }
                     }
@@ -46,24 +40,34 @@ fun AppNavigation(viewModel: CardViewModel) {
         }
 
         composable(
-            route = Screen.CreateCard.routeWithArgs,
-            arguments = Screen.CreateCard.arguments
-        ) { backStackEntry ->
-            // Implementar tela de criação
+            route = Screen.CreateCard.route
+        ) {
+            ByteGuessApplicationTheme {
+                CreateCardScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onSaveSuccess = {
+                        navController.popBackStack()
+                    }
+                )
+            }
         }
 
         composable(
-            route = Screen.Play.routeWithArgs,
-            arguments = Screen.Play.arguments
-        ) { backStackEntry ->
-            // Implementar tela de jogo
+            route = Screen.Play.route
+        ) {
+            ByteGuessApplicationTheme {
+                Text("Play Screen - Game Mode selection needed here")
+            }
         }
 
         composable(
-            route = Screen.Edit.routeWithArgs,
-            arguments = Screen.Edit.arguments
-        ) { backStackEntry ->
-            // Implementar tela de edição
+            route = Screen.Edit.route
+        ) {
+            ByteGuessApplicationTheme {
+                Text("Edit Screen - Card selection / Mode loading needed here")
+            }
         }
     }
 }
